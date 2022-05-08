@@ -1,2 +1,2 @@
 #Tris
-I've nothing to say, but add a README makes me cooler. Excuse me because i've coded it in italian
+I've absolutely nothing to say, but add a README makes me cooler, I hope you'll enjoy my project. Excuse me because i've coded it in italian.
