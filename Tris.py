@@ -259,16 +259,16 @@ class Tris:
                         print(f"{row} {col} è già occupata, riprova")            
         
                     if self.vittoria(player):
-                        self.ricomincia_o_fine(f"{player.upper()} HA VINTO")
+                        tris.ricomincia_o_fine(f"{player.upper()} HA VINTO")
                         if player == giocatore1:
                             punti_a += 1
                         else:
                             punti_b += 1
                         
                     if self.tabella_piena():
-                        self.ricomincia_o_fine("Pareggio!") 
+                        tris.ricomincia_o_fine("Pareggio!") 
 
-                    player = self.cambio_turno(player)
+                    player = tris.cambio_turno(player)
            
             except (IndexError and ValueError) or ValueError:
                 print("\nInserisci due valori interi compresi tra 1 e 3 separati da uno spazio\nes: 1 2")
