@@ -1,5 +1,4 @@
 import os
-import select
 import socket, subprocess
 import sys
 import threading
