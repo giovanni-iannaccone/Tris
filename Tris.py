@@ -546,6 +546,7 @@ class Tris:
                         valido = self.fix_spot(row, col, True)
                         if not valido:
                             print(f"La posizione {row} {col} è già occupata, riprova")
+                            sleep(2)
                     else:
                         try:
                             introduzione()
@@ -587,8 +588,8 @@ class Tris:
                 player = self.cambio_turno(player, nome_giocatore2)                  
 
         except (IndexError and ValueError) or ValueError:
-                print("\nInserisci due valori interi compresi tra 1 e 3 separati da uno spazio\nes: 1 2")
-                sleep(2)
+            print("\nInserisci due valori interi compresi tra 1 e 3 separati da uno spazio\nes: 1 2")
+            sleep(2)
 
         except IndexError:
             print("\nInserisci due valori interi compresi tra 1 e 3 separati da uno spazio\nes: 1 2")
