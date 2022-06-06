@@ -182,90 +182,101 @@ class Tris:
         except KeyboardInterrupt:
             tris.ricomincia_o_fine(None, None)
         
-    def mossa_computer(self, esecuzione, valido = True):
-        n = len(self.board)
-        spazi_liberi = 0
-        row, col = None, None
-
-        for row in self.board:
-            for oggetti in row:
-                if oggetti == "-":
-                    spazi_liberi += 1
-
-        if spazi_liberi > 6:
-            row, col = 2, 2
+    def mossa_computer(self, esecuzione, difficolta, valido = True):
+        if difficolta == 1:
+            row, col = choice([ 1, 2, 3 ]), choice([ 1, 2, 3 ])
             valido = self.fix_spot(row,  col, esecuzione)
-            if valido == False:
-                row, col = choice([ 1, 2, 3 ]), choice([ 1, 2, 3 ])
-                valido = self.fix_spot(row,  col, esecuzione)
-            
-            if valido:                                
-                return row, col, valido
+            if not valido:
+                while not valido:
+                    row, col = choice([ 1, 2, 3 ]), choice([ 1, 2, 3 ])
+                    valido = self.fix_spot(row,  col, esecuzione)
+            return row, col, valido
 
-        for h in range(2):
-            simbolo = self.simbolo if h == 1 else "X"
-            for i in range(n):
+        else:
+            n = len(self.board)
+            spazi_liberi = 0
+            row, col = None, None
+
+            for row in self.board:
+                for oggetti in row:
+                    if oggetti == "-":
+                        spazi_liberi += 1
+
+                    if spazi_liberi > 6:
+                        row, col = 2, 2
+                        valido = self.fix_spot(row,  col, esecuzione)
+                        if not valido:
+                            row, col = choice([ 1, 2, 3 ]), choice([ 1, 2, 3 ])
+                            valido = self.fix_spot(row,  col, esecuzione)
+                        
+                        if valido:                                
+                            return row, col, valido
+
+            for h in range(2):
+                simbolo = self.simbolo if h == 1 else "X"
+                for i in range(n):
+                    for j in range(n):
+                        l = 0
+                        if self.board[i][j] == simbolo:
+                            l += 1 
+                            if l == 2:
+                                for k in range(n):
+                                    row, col = i, k                                    
+                                    valido = self.fix_spot(row,  col, esecuzione)
+
+                                    if valido:
+                                        return row, col, valido
+
+            for h in range(2):
+                simbolo = self.simbolo if h == 1 else "X"                                   
                 for j in range(n):
                     l = 0
-                    if self.board[i][j] == simbolo:
-                        l += 1 
-                        if l == 2:
-                            for k in range(n):
-                                row, col = i+1, k + 1                                       
-                                valido = self.fix_spot(row,  col, esecuzione)
+                    for i in range(n):
+                        if self.board[i][j] == simbolo:
+                            l += 1 
+                            if l == 2:
+                                for k in range(n):
+                                    row, col = k, j             
+                                    valido = self.fix_spot(row,  col, esecuzione)
 
-                                if valido:
-                                    return row, col, valido
-
-        for h in range(2):
-            simbolo = self.simbolo if h == 1 else "X"                                   
-            for j in range(n):
-                l = 0
+                                    if valido:
+                                        return row, col, valido
+                        
+            for h in range(2):
+                simbolo = self.simbolo if h == 1 else "X"                                
                 for i in range(n):
-                    if self.board[i][j] == simbolo:
-                        l += 1 
-                        if l == 2:
-                            for k in range(n):
-                                row, col = j + 1, k + 1           
-                                valido = self.fix_spot(row,  col, esecuzione)
+                    i = j
+                    for k in range(n):
+                        l = 0
+                        if self.board[i][j] == simbolo:
+                            l += 1
+                            if l == 2:
+                                for m in range(n):
+                                    row, col = i + 1, j + 1
+                                    valido = self.fix_spot(row, col, esecuzione)
 
-                                if valido:
-                                    return row, col, valido
-                       
-        for h in range(2):
-            simbolo = self.simbolo if h == 1 else "X"                                
-            for i in range(n):
-                i = j
-                for k in range(n):
-                    l = 0
-                    if self.board[i][j] == simbolo:
-                        l += 1
-                        if l == 2:
-                            for m in range(n):
-                                row, col = i + 1, j + 1
-                                valido = self.fix_spot(row, col, esecuzione)
+                                    if valido:    
+                                        return row, col, valido
 
-                                if valido:    
-                                    return row, col, valido
+            for h in range(2):
+                simbolo = self.simbolo if h == 1 else "X"
+                row, col = 1, 3
+                for k in range(3):
+                    valido = self.fix_spot(row, col, esecuzione)
 
-        for h in range(2):
-            simbolo = self.simbolo if h == 1 else "X"
-            row, col = 1, 3
-            for k in range(3):
-                valido = self.fix_spot(row, col, esecuzione)
+                    if valido:    
+                        return row, col, valido
+                    else:
+                        row += 1
+                        col -= 1
 
-                if valido:    
-                    return row, col, valido
-                else:
-                    row += 1
-                    col -= 1
+            if row == None and col == None:
+                valido = False
+                while valido != True:
+                    row, col = choice([ 1, 2, 3 ]), choice([ 1, 2, 3 ])
+                    valido = self.fix_spot(row,  col, esecuzione)
 
-        if row == None and col == None:
-            while valido != True:
-                row, col = choice([ 1, 2, 3 ]), choice([ 1, 2, 3 ])
-                valido = self.fix_spot(row,  col, esecuzione)
-
-            return row, col
+                return row, col, True
                     
     def preparazione_partita(self):
         try:
@@ -440,6 +451,11 @@ class Tris:
         introduzione()
         print("      In questa modalità avrai a disposizione un aiuto, premi CTRL-C per usarlo")
         sleep(3)
+        introduzione()
+        print("\t-1 per la modalità facile")
+        print("\t-2 per la modalita difficile")
+        difficolta = int(input("Inserisci: "))
+
         while True:
             try:
                 if player == None:
@@ -460,9 +476,12 @@ class Tris:
                         if not valido:
                             print(f"La posizione {row} {col} è già occupata, riprova")                        
                     else:
-                        row, col, valido = self.mossa_computer(True)
-
-                        if valido:
+                        row, col, valido = self.mossa_computer(True, difficolta)
+                        if row not in (1, 2, 3) or col not in (1, 2, 3):
+                            print(f"⊙﹏⊙ ∥ Scusa ma a causa di un bug nel mio sistema non riesco a determinare dove ho inserito {self.simbolo} "+
+                                    "spero solo di aver fatto la mossa giusta ... bip bop *lucine da bug, suoni robotici*")
+                            sleep(2)
+                        else:
                             print(f"E' il mio turno, inserisco {self.simbolo} in {row}, {col}")
 
                 if player == self.giocatore2:
@@ -495,7 +514,7 @@ class Tris:
                     risposta = input("Hai bisogno di un suggerimento ? s/n ")
                     if risposta in ("S", "s"):
                         while valido != True:
-                            row, col, valido = self.mossa_computer(False)
+                            row, col, valido = self.mossa_computer(False, difficolta)
                         print(f"Mmh, fammici pensare ... suggerico di inserire {self.simbolo} in {row} {col}")
                         print("Adesso non hai più aiuti a disposizione")
                         sleep(2)
