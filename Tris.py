@@ -563,7 +563,7 @@ class Tris:
                 valido = False
 
                 self.simbolo = "X" if risposta != 1 else "O"
-
+                sleep(pausa)
                 while valido != True:    
 
                     if player == self.giocatore1:
