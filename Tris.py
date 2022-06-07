@@ -1,10 +1,8 @@
-import pyfiglet
 import os
 import socket, subprocess
 import sys
 
 from random import choice
-from rich.console import Console
 from time import sleep
 
 def introduzione():
@@ -12,19 +10,13 @@ def introduzione():
     print(" TRIS ".center(86, "="))
        
 def chiusura(client):
-    console.print("\n" + choice(["Ok, alla prossima  ಥ _ ಥ", "Uffa, ci vediamo இ ௰ இ", "Va bene, vorrà dire che mi riposerò un po' (._. )", "Mi mancherai （；´д｀）ゞ",
+    print("\n" + choice(["Ok, alla prossima  ಥ _ ಥ", "Uffa, ci vediamo இ ௰ இ", "Va bene, vorrà dire che mi riposerò un po' (._. )", "Mi mancherai （；´д｀）ゞ",
                          "Ne sei proprio sicuro ? o(￣┰￣*)ゞ", "Peccato, mi stavo divertendo tanto o(TヘTo)", "Ok, quando vuoi io sono qui ┻━┻ ︵ヽ(`Д´)ﾉ",
-                         "E' sempre triste vederti andare via (;´༎ຶД༎ຶ`)", "Spero di rivederti presto ┗( T﹏T )┛", ""]), style="bold red")
+                         "E' sempre triste vederti andare via (;´༎ຶД༎ຶ`)", "Spero di rivederti presto ┗( T﹏T )┛", ""]))
     if client != None:
         client.close()
     sleep(2)
     sys.exit()
-
-def ascii_art():
-    ascii_art = pyfiglet.figlet_format("O TRIS X")
-    console.print(ascii_art, style="bold green")
-    console.print("X O " * 10, style="bold green")
-    sleep(3)
     
 #################################################################### Port Scanner ####################################################################
 
@@ -131,7 +123,7 @@ class Tris:
     def mostra_tabella(self):
         for row in self.board:
             for oggetti in row:
-                console.print(oggetti, end=" ", style="bold blue")
+                print(oggetti, end=" ")
             print()
 
     def ricevi_tabella(self, client):
@@ -155,8 +147,8 @@ class Tris:
             while self.giocatore1 == self.giocatore2:
                 introduzione()
                 if modalita in ("A", "a"):
-                    self.giocatore1 = str(console.input("Inserisci il nome del primo giocatore ([bold blue]X[/bold blue]): "))
-                    self.giocatore2 = str(console.input("Inserisci il nome del secondo giocatore ([bold red]O[/bold red]): "))
+                    self.giocatore1 = str(input("Inserisci il nome del primo giocatore (X): "))
+                    self.giocatore2 = str(input("Inserisci il nome del secondo giocatore (O): "))
                 else:
                     self.giocatore1 = str(input("Come ti chiami ? "))
                     self.giocatore2 = "computer" if modalita in ("B", "b") else None
@@ -360,12 +352,12 @@ class Tris:
                     client.bind((ip, porta))
                     client.listen(1)
                     introduzione()
-                    console.print(f"-IP: \t[bold blue]{ip}[/bold blue]")
-                    console.print(f"-Porta: [bold blue]{porta}[/bold blue]")
+                    print(f"-IP: \t{ip}")
+                    print(f"-Porta: {porta}")
                     print("\nIn attesa che qualcuno si connetta ( potrebbe volerci un po' ) ...")
 
                 except Exception as e:
-                    console.print(f"Errore durante la creazione del server: [bold red]{e}[/bold red]")
+                    print(f"Errore durante la creazione del server: {e}")
                     sleep(2)
                     sys.exit(1)
 
@@ -382,7 +374,7 @@ class Tris:
                 j -= 1
 
         except ConnectionRefusedError:
-            console.print("\nServer inesistente nella tua rete", style="bold red")
+            print("\nServer inesistente nella tua rete")
             sleep(2)
             sys.exit(1)
 
@@ -636,7 +628,6 @@ class Tris:
 
     def inizio(self):
         try:
-            ascii_art()
             global modalita
             modalita = None
             introduzione()
@@ -661,6 +652,5 @@ class Tris:
                 self.inizio()
 
 if __name__ == "__main__":
-    console = Console()
     tris = Tris()      
     tris.inizio()
