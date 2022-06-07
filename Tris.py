@@ -1,7 +1,6 @@
 import os
 import socket, subprocess
 import sys
-import threading
 
 from random import choice
 from time import sleep
