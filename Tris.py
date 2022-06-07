@@ -196,23 +196,21 @@ class Tris:
             n = len(self.board)
             spazi_liberi = 0
             row, col = None, None
-
             for row in self.board:
                 for oggetti in row:
                     if oggetti == "-":
                         spazi_liberi += 1
+            if spazi_liberi > 6:
+                row, col = 2, 2
+                valido = self.fix_spot(row,  col, esecuzione)
+                if valido == False:
+                    row, col = choice([ 1, 2, 3 ]), choice([ 1, 2, 3 ])
+                    valido = self.fix_spot(row,  col, esecuzione)
+                
+                if valido:                                
+                    return row, col, valido
 
-                    if spazi_liberi > 6:
-                        row, col = 2, 2
-                        valido = self.fix_spot(row,  col, esecuzione)
-                        if not valido:
-                            row, col = choice([ 1, 2, 3 ]), choice([ 1, 2, 3 ])
-                            valido = self.fix_spot(row,  col, esecuzione)
-                        
-                        if valido:                                
-                            return row, col, valido
-
-            for h in range(2):
+            for h in range(1, 2):
                 simbolo = self.simbolo if h == 1 else "X"
                 for i in range(n):
                     for j in range(n):
@@ -221,13 +219,12 @@ class Tris:
                             l += 1 
                             if l == 2:
                                 for k in range(n):
-                                    row, col = i, k                                    
+                                    row, col = i+1, k + 1                                       
                                     valido = self.fix_spot(row,  col, esecuzione)
-
                                     if valido:
                                         return row, col, valido
 
-            for h in range(2):
+            for h in range(1, 2):
                 simbolo = self.simbolo if h == 1 else "X"                                   
                 for j in range(n):
                     l = 0
@@ -236,13 +233,12 @@ class Tris:
                             l += 1 
                             if l == 2:
                                 for k in range(n):
-                                    row, col = k, j             
+                                    row, col = j + 1, k + 1           
                                     valido = self.fix_spot(row,  col, esecuzione)
-
                                     if valido:
                                         return row, col, valido
                         
-            for h in range(2):
+            for h in range(1, 2):
                 simbolo = self.simbolo if h == 1 else "X"                                
                 for i in range(n):
                     i = j
@@ -254,29 +250,25 @@ class Tris:
                                 for m in range(n):
                                     row, col = i + 1, j + 1
                                     valido = self.fix_spot(row, col, esecuzione)
-
                                     if valido:    
                                         return row, col, valido
 
-            for h in range(2):
+            for h in range(1, 2):
                 simbolo = self.simbolo if h == 1 else "X"
                 row, col = 1, 3
                 for k in range(3):
                     valido = self.fix_spot(row, col, esecuzione)
-
                     if valido:    
                         return row, col, valido
                     else:
                         row += 1
                         col -= 1
-
+                        
             if row == None and col == None:
-                valido = False
                 while valido != True:
                     row, col = choice([ 1, 2, 3 ]), choice([ 1, 2, 3 ])
                     valido = self.fix_spot(row,  col, esecuzione)
-
-                return row, col, True
+                return row, col
                     
     def preparazione_partita(self):
         try:
@@ -446,15 +438,16 @@ class Tris:
         self.crea_tabella()
         if self.giocatore1 is self.giocatore2:
             self.primo_giocatore_casuale()
-        punti_a, punti_b, aiuti = 0, 0, 1
+        punti_a, punti_b, aiuti, difficolta = 0, 0, 1, None
 
         introduzione()
         print("      In questa modalità avrai a disposizione un aiuto, premi CTRL-C per usarlo")
         sleep(3)
-        introduzione()
-        print("\t-1 per la modalità facile")
-        print("\t-2 per la modalita difficile")
-        difficolta = int(input("Inserisci: "))
+        while difficolta not in (1, 2):
+            introduzione()
+            print("\t-1 per la modalità facile")
+            print("\t-2 per la modalita difficile")
+            difficolta = int(input("Inserisci: "))
 
         while True:
             try:
@@ -476,13 +469,12 @@ class Tris:
                         if not valido:
                             print(f"La posizione {row} {col} è già occupata, riprova")                        
                     else:
-                        row, col, valido = self.mossa_computer(True, difficolta)
-                        if row not in (1, 2, 3) or col not in (1, 2, 3):
-                            print(f"⊙﹏⊙ ∥ Scusa ma a causa di un bug nel mio sistema non riesco a determinare dove ho inserito {self.simbolo} "+
-                                    "spero solo di aver fatto la mossa giusta ... bip bop *lucine da bug, suoni robotici*")
-                            sleep(2)
-                        else:
-                            print(f"E' il mio turno, inserisco {self.simbolo} in {row}, {col}")
+                        try:
+                            row, col, valido = self.mossa_computer(True, difficolta)
+                        except TypeError:
+                            row, col = choice([1, 2, 3]), choice([1, 2, 3])
+                            valido = self.fix_spot(row, col, True)
+                        print(f"E' il mio turno, inserisco {self.simbolo} in {row}, {col}")
 
                 if player == self.giocatore2:
                     sleep(2)
@@ -514,8 +506,12 @@ class Tris:
                     risposta = input("Hai bisogno di un suggerimento ? s/n ")
                     if risposta in ("S", "s"):
                         while valido != True:
-                            row, col, valido = self.mossa_computer(False, difficolta)
-                        print(f"Mmh, fammici pensare ... suggerico di inserire {self.simbolo} in {row} {col}")
+                            try:
+                                row, col, valido = self.mossa_computer(True, difficolta)
+                            except TypeError:
+                                row, col = choice([1, 2, 3]), choice([1, 2, 3])
+                                valido = self.fix_spot(row, col, True)
+                        print(f"Mmh, fammici pensare ... suggerico di inserire {self.simbolo} in {row if row in (1, 2, 3) else row + 1} {col if col in (1, 2, 3) else col + 1}")
                         print("Adesso non hai più aiuti a disposizione")
                         sleep(2)
                         aiuti = 0
