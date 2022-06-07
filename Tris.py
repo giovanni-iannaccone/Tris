@@ -434,6 +434,7 @@ class Tris:
                 tris.ricomincia_o_fine(None, None) 
                 
     def vs_computer(self, player):
+        def vs_computer(self, player):
         self.crea_tabella()
         if self.giocatore1 is self.giocatore2:
             self.primo_giocatore_casuale()
@@ -447,6 +448,9 @@ class Tris:
             print("\t-1 per la modalità facile")
             print("\t-2 per la modalita difficile")
             difficolta = int(input("Inserisci: "))
+
+        if difficolta == 1:
+            player = self.giocatore1
 
         while True:
             try:
@@ -506,7 +510,7 @@ class Tris:
                     if risposta in ("S", "s"):
                         while valido != True:
                             try:
-                                row, col, valido = self.mossa_computer(True, difficolta)
+                                row, col, valido = self.mossa_computer(True, difficolta = 2)
                             except TypeError:
                                 row, col = choice([1, 2, 3]), choice([1, 2, 3])
                                 valido = self.fix_spot(row, col, True)
