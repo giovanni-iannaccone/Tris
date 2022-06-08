@@ -334,7 +334,7 @@ class Tris:
                                         client.send("Connesso".encode())
 
                         else:
-                            connession(client)
+                            connessione(client)
                                     
                                 
                 except TimeoutError or ConnectionRefusedError:
