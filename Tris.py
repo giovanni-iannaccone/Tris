@@ -36,6 +36,19 @@ def scan_port(ip):
 
 #################################################################### Port Scanner ####################################################################
 
+def connessione(client):
+    ip, porta = "", 65536
+    try:
+        while not ip.count("."):
+            ip = str(input("Inserisci l'ip del server della partita: "))
+    except ValueError:
+        ip = "127.0.0.1"
+    while porta > 65535:
+        porta = int(input("Inserisci la porta del server della partita: "))
+        if porta > 65535:
+            print("Le porte arrivano fino a 65535, reinserisci")
+    client.connect((ip, porta)) 
+
 class Tris:
     
     def __init__(self):
@@ -126,17 +139,26 @@ class Tris:
                 print(oggetti, end=" ")
             print()
 
-    def ricevi_tabella(self, client):
-        print("sto ricevendo la tabella ... ")
-        n = len(self.board)
-        for i in range(n):
-            for j in range(n):
-                self.board[i][j] = client.recv(sys.getsizeof("-")).decode()
+    def ricevi_tabella(self, client, risposta):
+        client.send("Sto ricevendo".encode())
+        ricevuto = client.recv(2048).decode()
+        if ricevuto == "Sto ricevendo" and risposta == 1:
+            manda_tabella(client, 0.5)
+        else:
+            print("sto ricevendo la tabella ... ")
+            n = len(self.board)
+            for i in range(n):
+                for j in range(n):
+                    self.board[i][j] = client.recv(sys.getsizeof("-")).decode()
 
     def manda_tabella(self, client, pausa):
+        sleep(pausa)
+        client.recv(2048).decode()
+        client.send("Sto mandando".encode())
+        sleep(pausa)
         print("sto mandando la tabella ...")
         n = len(self.board)
-        sleep(1)
+        sleep(pausa)
         for i in range(n):
             for j in range(n):
                 sleep(pausa)
@@ -180,7 +202,7 @@ class Tris:
                 
         except KeyboardInterrupt:
             tris.ricomincia_o_fine(None, None)
-        
+
     def mossa_computer(self, esecuzione, difficolta, valido = True):
         if difficolta == 1:
             row, col = choice([ 1, 2, 3 ]), choice([ 1, 2, 3 ])
@@ -285,18 +307,7 @@ class Tris:
 
                     introduzione()
                     if opzione == 1:
-                        ip, porta = "", 65536
-                        try:
-                            while not ip.count("."):
-                                ip = str(input("Inserisci l'ip del server della partita: "))
-                        except ValueError:
-                            ip = "127.0.0.1"
-                        while porta > 65535:
-                            porta = int(input("Inserisci la porta del server della partita: "))
-                            if porta > 65535:
-                                print("Le porte arrivano fino a 65535, reinserisci")
-                        client.connect((ip, porta))
-                            
+                        connessione(client)                           
                     else:
                         print("\t\t\t\t   -- ATTENZIONE --\n\t\tLA SCANSIONE POTREBBE ESSERE POTENZIALMENTE ILLEGALE,",
                                         "\n\t\t\tIO NON MI ASSUMO ALCUNA RESPONSABILITA'")
@@ -321,6 +332,9 @@ class Tris:
                                             continue
                                     else:
                                         client.send("Connesso".encode())
+
+                        else:
+                            connession(client)
                                     
                                 
                 except TimeoutError or ConnectionRefusedError:
@@ -550,16 +564,16 @@ class Tris:
                         player = client.recv(2048).decode()
 
                 introduzione()
-                self.ricevi_tabella(client) if player == self.giocatore1 else self.manda_tabella(client, pausa)
-                print(f"{self.giocatore1}: {punti_a}".center(43 - (len(self.giocatore1)+len(str(punti_a))), " "), f"{nome_giocatore2}: {punti_b}".center(43 - (len(self.giocatore1)+len(str(punti_a))), " "))
+                self.ricevi_tabella(client, risposta) if player == self.giocatore1 else self.manda_tabella(client, pausa)
                 valido = False
 
                 self.simbolo = "X" if risposta != 1 else "O"
-                sleep(pausa)
+
                 while valido != True:    
 
                     if player == self.giocatore1:
                         introduzione()
+                        print(f"{self.giocatore1}: {punti_a}".center(43 - (len(self.giocatore1)+len(str(punti_a))), " "), f"{nome_giocatore2}: {punti_b}".center(43 - (len(self.giocatore1)+len(str(punti_a))), " "))
                         self.mostra_tabella()
                         row, col = list(map(int, input(f"E' il tuo turno, inserisci la riga e la colonna in cui vuoi inserire {self.simbolo}: ").split()))
                         valido = self.fix_spot(row, col, True)
@@ -569,9 +583,9 @@ class Tris:
                     else:
                         try:
                             introduzione()
+                            print(f"{self.giocatore1}: {punti_a}".center(43 - (len(self.giocatore1)+len(str(punti_a))), " "), f"{nome_giocatore2}: {punti_b}".center(43 - (len(self.giocatore1)+len(str(punti_a))), " "))
                             self.mostra_tabella()
                             print("Il tuo avversario sta ancora scegliendo ... ")
-                            sleep(0.5)
                             dimensione_messaggio = sys.getsizeof("X")
                             if client.recv(dimensione_messaggio).decode():
                                 break
@@ -620,7 +634,7 @@ class Tris:
             self.gioca_online(player)
 
         except ConnectionResetError or ConnectionAbortedError:
-            print("Mi dispiace ma il tuo avversario potrebbe aver abbandonato la partita, questo significa che hai vinto ... credo")
+            print("Mi dispiace ma il tuo avversario potrebbe aver abbandonato la partita,\nquesto significa che hai vinto ... credo")
             sleep(2)
 
         except KeyboardInterrupt:
