@@ -636,7 +636,7 @@ class Tris:
                 modalita = input("\t-A per la modalità due giocatori\n\t-B per la modalità contro il computer\n\t-C per la modalità online\nInserisci: ")
 
             introduzione()
-            console.print("      Durante il gioco, premi [bold blue]CTRL-C[/bold blue] per terminare la partita o ricominciarla")    
+            print("      Durante il gioco, premi CTRL-C per terminare la partita o ricominciarla")    
             sleep(3)
             player = self.primo_giocatore_casuale()
 
