@@ -145,12 +145,7 @@ class Tris:
                 print(oggetti, end=" ")
             print()
 
-    def ricevi_tabella(self, client, risposta):
-        client.send("R".encode())
-        azione = client.recv(sys.getsizeof("R")).decode()
-        if risposta == 1 and azione == "R":
-            self.manda_tabella(client, 0.5)
-        else:
+    def ricevi_tabella(self, client):
             print("sto ricevendo la tabella ... ")
             n = len(self.board)
             for i in range(n):
@@ -158,8 +153,6 @@ class Tris:
                     self.board[i][j] = client.recv(sys.getsizeof("-")).decode()
 
     def manda_tabella(self, client, pausa):
-        client.recv(sys.getsizeof("R")).decode()
-        client.send("M".encode())
         print("sto mandando la tabella ...")
         n = len(self.board)
         sleep(pausa)
@@ -555,7 +548,7 @@ class Tris:
         try:
             if risposta == 1:
                 nome_giocatore2 = client.recv(2048).decode()
-                while self.giocatore1 == nome_giocatore2 and risposta == 1:
+                while self.giocatore1 == nome_giocatore2:
                     print("I nomi dei due giocatori non possono essere uguali")
                     self.giocatore1 = input("Inserisci un altro nome: ")
                 client.send(self.giocatore1.encode())
@@ -569,15 +562,9 @@ class Tris:
 
             punti_a, punti_b, pausa = 0, 0, 0.5
             while True:
-                if player == None:
-                    player = choice([self.giocatore1, nome_giocatore2])
-                    if player == self.giocatore1:
-                        client.send(player.encode())
-                    else:
-                        player = client.recv(2048).decode()
-
+                
                 introduzione()
-                self.ricevi_tabella(client, risposta) if player == self.giocatore1 else self.manda_tabella(client, pausa)
+                self.ricevi_tabella(client) if player == self.giocatore1 else self.manda_tabella(client, pausa)
                 valido = False
 
                 self.simbolo = "X" if risposta != 1 else "O"
