@@ -146,29 +146,21 @@ class Tris:
             print()
 
     def ricevi_tabella(self, client, risposta):
-        client.send("Sto ricevendo".encode())
-        ricevuto = client.recv(2048).decode()
-        if ricevuto == "Sto ricevendo" and risposta == 1:
-            manda_tabella(client, 0.5)
-        else:
-            print("sto ricevendo la tabella ... ")
-            n = len(self.board)
-            for i in range(n):
-                for j in range(n):
-                    self.board[i][j] = client.recv(sys.getsizeof("-")).decode()
+        print("sto ricevendo la tabella ... ")
+        n = len(self.board)
+        for i in range(n):
+            for j in range(n):
+                self.board[i][j] = client.recv(sys.getsizeof("-")).decode()
 
     def manda_tabella(self, client, pausa):
-        sleep(pausa)
-        client.recv(2048).decode()
-        client.send("Sto mandando".encode())
         sleep(pausa)
         print("sto mandando la tabella ...")
         n = len(self.board)
         sleep(pausa)
-        for i in range(n):
-            for j in range(n):
+        for row in self.board:
+            for oggetti in row:
                 sleep(pausa)
-                client.send(self.board[i][j].encode())
+                client.send(oggetti.encode())
 
     def primo_giocatore_casuale(self):
         try:
@@ -295,15 +287,25 @@ class Tris:
             risposta, opzione = None, None
             introduzione()
             while risposta not in (1, 2):
-                risposta = int(input("\t-1 se vuoi cercare partita a cui connetterti\n\t-2 se vuoi creare una nuova partita\nInserisci: "))
-
-            introduzione()
+                try:
+                    introduzione()
+                    risposta = int(input("\t-1 se vuoi cercare partita a cui connetterti\n\t-2 se vuoi creare una nuova partita\nInserisci: "))
+                except ValueError:
+                    print("Inserisci una delle opzioni")
+                    sleep(1)
+                    continue
+            
+            client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             if risposta == 1:
-                client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 try:
                     while opzione not in (1, 2):
-                        opzione = int(input("\t-1 se cerchi una stanza in particolare\n\t-2 se vuoi attivare una ricerca casuale di una partita disponibile\nInserisci: "))
-
+                        try:
+                            introduzione()
+                            opzione = int(input("\t-1 se cerchi una stanza in particolare\n\t-2 se vuoi attivare una ricerca casuale di una partita disponibile\nInserisci: "))
+                        except ValueError:
+                            print("Inserisci una delle opzioni")
+                            sleep(1)
+                            continue
                     introduzione()
                     if opzione == 1:
                         connessione(client)                           
@@ -361,7 +363,6 @@ class Tris:
                     except ValueError:
                         porta = 5555
                 try:
-                    client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                     client.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
                     client.bind((ip, porta))
                     client.listen(1)
@@ -458,8 +459,13 @@ class Tris:
         print("      In questa modalità avrai a disposizione un aiuto, premi CTRL-C per usarlo")
         sleep(3)
         while difficolta not in (1, 2):
-            introduzione()
-            difficolta = int(input("\t-1 per la modalità facile\n\t-2 per la modalita difficile\nInserisci: "))
+            try:
+                introduzione()
+                difficolta = int(input("\t-1 per la modalità facile\n\t-2 per la modalita difficile\nInserisci: "))
+            except ValueError:
+                print("Inserisci una delle opzioni")
+                sleep(1)
+                continue
 
         if difficolta == 1:
             player = self.giocatore1
@@ -666,5 +672,5 @@ class Tris:
                 self.inizio()
 
 if __name__ == "__main__":
-    tris = Tris()      
+    tris = Tris()
     tris.inizio()
