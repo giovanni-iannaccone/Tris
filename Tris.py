@@ -146,14 +146,20 @@ class Tris:
             print()
 
     def ricevi_tabella(self, client, risposta):
-        print("sto ricevendo la tabella ... ")
-        n = len(self.board)
-        for i in range(n):
-            for j in range(n):
-                self.board[i][j] = client.recv(sys.getsizeof("-")).decode()
+        client.send("R".encode())
+        azione = client.recv(sys.getsizeof("R")).decode()
+        if risposta == 1 and azione == "R":
+            self.manda_tabella(client, 0.5)
+        else:
+            print("sto ricevendo la tabella ... ")
+            n = len(self.board)
+            for i in range(n):
+                for j in range(n):
+                    self.board[i][j] = client.recv(sys.getsizeof("-")).decode()
 
     def manda_tabella(self, client, pausa):
-        sleep(pausa)
+        client.recv(sys.getsizeof("R")).decode()
+        client.send("M".encode())
         print("sto mandando la tabella ...")
         n = len(self.board)
         sleep(pausa)
@@ -345,6 +351,7 @@ class Tris:
                 porta = 65536
                 ip = str(socket.gethostbyname(socket.gethostname()))
                 while opzione not in ("S", "s", "N", "n"):
+                    introduzione()
                     opzione = input(f"Il tuo indirizzo ip è {ip}, vuoi usare questo come ip del server ? s/n ")
                 if opzione in ("N", "n"):
                     try:
