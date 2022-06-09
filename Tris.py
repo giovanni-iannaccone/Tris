@@ -12,13 +12,11 @@ def introduzione():
 def chiusura(client):
     print("\n" + choice(["Ok, alla prossima  ಥ _ ಥ", "Uffa, ci vediamo இ ௰ இ", "Va bene, vorrà dire che mi riposerò un po' (._. )", "Mi mancherai （；´д｀）ゞ",
                          "Ne sei proprio sicuro ? o(￣┰￣*)ゞ", "Peccato, mi stavo divertendo tanto o(TヘTo)", "Ok, quando vuoi io sono qui ┻━┻ ︵ヽ(`Д´)ﾉ",
-                         "E' sempre triste vederti andare via (;´༎ຶД༎ຶ`)", "Spero di rivederti presto ┗( T﹏T )┛", ""]))
+                         "E' sempre triste vederti andare via (;´༎ຶД༎ຶ`)", "Spero di rivederti presto ┗( T﹏T )┛"]))
     if client != None:
         client.close()
     sleep(2)
     sys.exit()
-    
-#################################################################### Port Scanner ####################################################################
 
 def scan_port(ip):
     OPEN_PORTS = []
@@ -34,20 +32,28 @@ def scan_port(ip):
 
     return OPEN_PORTS
 
-#################################################################### Port Scanner ####################################################################
-
 def connessione(client):
     ip, porta = "", 65536
     try:
-        while not ip.count("."):
+        while ip.count(".") != 3:
             ip = str(input("Inserisci l'ip del server della partita: "))
+            if ip.count(".") != 3:
+                print(f"{ip} non è un indirizzo valido")
     except ValueError:
         ip = "127.0.0.1"
-    while porta > 65535:
-        porta = int(input("Inserisci la porta del server della partita: "))
-        if porta > 65535:
-            print("Le porte arrivano fino a 65535, reinserisci")
-    client.connect((ip, porta)) 
+    try:
+        while porta > 65535:
+            porta = int(input("Inserisci la porta del server della partita: "))
+            if porta > 65535:
+                print("Le porte arrivano fino a 65535, reinserisci")
+    except ValueError:
+        porta = 5555
+    try:
+        client.connect((ip, porta))
+    except OSError:
+        print(f"{ip} non è un indirizzo valido")
+        sleep(2)
+        connessione(client)
 
 class Tris:
     
@@ -176,7 +182,8 @@ class Tris:
                     self.giocatore2 = "computer" if modalita in ("B", "b") else None
                     
                 if self.giocatore1 == self.giocatore2:
-                    print("\nI nomi dei due giocatori non possono essere uguali\n")                
+                    print("\nI nomi dei due giocatori non possono essere uguali\n")
+                                    
         except KeyboardInterrupt:
             tris.ricomincia_o_fine(None, None)
                 
@@ -244,9 +251,7 @@ class Tris:
                                     valido = self.fix_spot(row,  col, esecuzione)
                                     if valido:
                                         return row, col, valido
-
-            for h in range(1, 2):
-                simbolo = self.simbolo if h == 1 else "X"                                   
+                                
                 for j in range(n):
                     l = 0
                     for i in range(n):
@@ -258,26 +263,20 @@ class Tris:
                                     valido = self.fix_spot(row,  col, esecuzione)
                                     if valido:
                                         return row, col, valido
-                        
-            for h in range(1, 2):
-                simbolo = self.simbolo if h == 1 else "X"                                
+                                              
                 for i in range(n):
-                    i = j
-                    for k in range(n):
-                        l = 0
-                        if self.board[i][j] == simbolo:
-                            l += 1
-                            if l == 2:
-                                for m in range(n):
-                                    row, col = i + 1, j + 1
-                                    valido = self.fix_spot(row, col, esecuzione)
-                                    if valido:    
-                                        return row, col, valido
+                    l = 0
+                    if self.board[i][i] == simbolo:
+                        l += 1
+                        if l == 2:
+                            for j in range(n):
+                                row, col = j, j
+                                valido = self.fix_spot(row, col, esecuzione)
+                                if valido:    
+                                    return row, col, valido
 
-            for h in range(1, 2):
-                simbolo = self.simbolo if h == 1 else "X"
                 row, col = 1, 3
-                for k in range(3):
+                for i in range(n):
                     valido = self.fix_spot(row, col, esecuzione)
                     if valido:    
                         return row, col, valido
@@ -332,13 +331,11 @@ class Tris:
                                             continue
                                     else:
                                         client.send("Connesso".encode())
-
                         else:
-                            connessione(client)
-                                    
+                            connessione(client)                           
                                 
                 except TimeoutError or ConnectionRefusedError:
-                    print("\nServer inesistente nella tua rete")
+                    print("\nServer inesistente nella tua rete o già occupato")
                     sleep(2)
                     sys.exit(1)
                 
@@ -350,16 +347,19 @@ class Tris:
                 if opzione in ("N", "n"):
                     try:
                         ip = ""
-                        while not ip.count("."):
+                        while ip.count(".") > 3:
                             ip = str(input("Inserisci l'indirizzo ip che vuoi usare: "))
-                            if not ip.count("."):
+                            if ip.count(".") > 3:
                                 print("Indirizzo ip non valido")
                     except ValueError:
                         ip = "127.0.0.1"
                 while porta > 65535:
-                    porta = int(input("Inserisci la porta del server della partita: "))
-                    if porta > 65535:
-                        print(f"Le porte arrivano fino a {porta}, reinserisci")
+                    try:
+                        porta = int(input("Inserisci la porta del server della partita: "))
+                        if porta > 65535:
+                            print(f"Le porte arrivano fino a {porta}, reinserisci")
+                    except ValueError:
+                        porta = 5555
                 try:
                     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                     client.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -459,9 +459,7 @@ class Tris:
         sleep(3)
         while difficolta not in (1, 2):
             introduzione()
-            print("\t-1 per la modalità facile")
-            print("\t-2 per la modalita difficile")
-            difficolta = int(input("Inserisci: "))
+            difficolta = int(input("\t-1 per la modalità facile\n\t-2 per la modalita difficile\nInserisci: "))
 
         if difficolta == 1:
             player = self.giocatore1
@@ -469,9 +467,9 @@ class Tris:
         while True:
             try:
                 if player == None:
-                    player = choice([self.giocatore1, self.giocatore2])
+                    player = choice([self.giocatore1, self.giocatore2]) if difficolta == 2 else self.giocatore1
                 introduzione()
-                print(f"{self.giocatore1}: {punti_a}".center(43 - (len(self.giocatore1)+len(str(punti_a))), " "), f"{self.giocatore2}: {punti_b}".center(43 - (len(self.giocatore1)+len(str(punti_a))), " "))
+                print(f"{self.giocatore1}: {punti_a}".center(43 - (len(f"{self.giocatore1}: {punti_a}")), " "), f"{self.giocatore2}: {punti_b}".center(43 - (len(f"{self.giocatore2}: {punti_b}")), " "))
 
                 self.mostra_tabella()
                 valido = False
@@ -491,7 +489,9 @@ class Tris:
                         except TypeError:
                             row, col = choice([1, 2, 3]), choice([1, 2, 3])
                             valido = self.fix_spot(row, col, True)
-                        print(f"E' il mio turno, inserisco {self.simbolo} in {row}, {col}")
+                        
+                        if valido:
+                            print(f"E' il mio turno, inserisco {self.simbolo} in {row}, {col}")
 
                 if player == self.giocatore2:
                     sleep(2)
